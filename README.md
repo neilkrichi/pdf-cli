@@ -12,7 +12,7 @@ A command-line interface tool for manipulating PDF files. This tool provides sim
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/pdf-cli.git
+git clone https://github.com/neilkrichi/pdf-cli.git
 cd pdf-cli
 ```
 
