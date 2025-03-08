@@ -5,9 +5,25 @@ import path from "path";
 import chalk from "chalk";
 import { confirmOverwrite } from "./utils";
 
-export async function splitPDF(file: string, outputFolder: string = "output_pdfs") {
+interface PageRange {
+  start: number;
+  end: number;
+}
+
+export async function splitPDF(
+  file: string, 
+  outputFolder: string = "output_pdfs",
+  rangeString?: string
+) {
   try {
-    console.log(chalk.blue("🔄 Splitting PDF..."));
+    console.log(chalk.blue("🔄 Processing PDF..."));
+
+    // Parse range string if provided
+    let pageRange: PageRange | undefined;
+    if (rangeString) {
+      const [start, end] = rangeString.split('-').map(Number);
+      pageRange = { start, end };
+    }
 
     const normalizedFile = path.normalize(file);
     const normalizedOutputFolder = path.normalize(outputFolder);
@@ -21,47 +37,83 @@ export async function splitPDF(file: string, outputFolder: string = "output_pdfs
     const pdfBytes = await readFile(normalizedFile);
     const pdf = await PDFDocument.load(pdfBytes);
     
-    // Check for existing files before processing
-    const existingFiles = [];
-    for (let i = 0; i < pdf.getPageCount(); i++) {
+    // Validate page range
+    const totalPages = pdf.getPageCount();
+    let startPage = 1;
+    let endPage = totalPages;
+
+    if (pageRange) {
+      if (pageRange.start < 1 || pageRange.end > totalPages || pageRange.start > pageRange.end) {
+        throw new Error(`Invalid page range. Document has ${totalPages} pages. Requested range: ${pageRange.start}-${pageRange.end}`);
+      }
+      startPage = pageRange.start;
+      endPage = pageRange.end;
+    }
+
+    // Convert to 0-based index for internal use
+    const startIndex = startPage - 1;
+    const endIndex = endPage - 1;
+
+    if (pageRange) {
+      // Create a single PDF with the selected range
       const outputPath = path.join(
         normalizedOutputFolder, 
-        `${baseFileName}-page-${i + 1}.pdf`
+        `${baseFileName}-pages-${startPage}-to-${endPage}.pdf`
       );
+
       if (existsSync(outputPath)) {
-        existingFiles.push(outputPath);
+        const shouldContinue = await confirmOverwrite(outputPath);
+        if (!shouldContinue) {
+          console.log(chalk.yellow("⚠️  Operation cancelled"));
+          process.exit(0);
+        }
       }
-    }
 
-    if (existingFiles.length > 0) {
-      console.log(chalk.yellow("\n⚠️  The following files already exist:"));
-      existingFiles.forEach(file => console.log(chalk.yellow(`   ${file}`)));
-      
-      const shouldContinue = await confirmOverwrite("these files");
-      if (!shouldContinue) {
-        console.log(chalk.yellow("⚠️  Operation cancelled"));
-        process.exit(0);
-      }
-    }
-
-    for (let i = 0; i < pdf.getPageCount(); i++) {
       const newPdf = await PDFDocument.create();
-      const [copiedPage] = await newPdf.copyPages(pdf, [i]);
-      newPdf.addPage(copiedPage);
+      const pageIndexes = Array.from(
+        { length: endIndex - startIndex + 1 }, 
+        (_, i) => startIndex + i
+      );
+      const copiedPages = await newPdf.copyPages(pdf, pageIndexes);
+      copiedPages.forEach(page => newPdf.addPage(page));
 
       const newPdfBytes = await newPdf.save();
-      const outputPath = path.join(
-        normalizedOutputFolder, 
-        `${baseFileName}-page-${i + 1}.pdf`
-      );
       await writeFile(outputPath, newPdfBytes);
 
       console.log(chalk.green(`✅ Saved: ${outputPath}`));
-    }
+      console.log(chalk.green(`🎉 Extraction completed successfully! Pages ${startPage}-${endPage}`));
+    } else {
+      // Split into individual pages
+      console.log(chalk.blue(`📄 Splitting into ${totalPages} individual pages...`));
+      
+      for (let i = startIndex; i <= endIndex; i++) {
+        const pageNum = i + 1;
+        const outputPath = path.join(
+          normalizedOutputFolder, 
+          `${baseFileName}-page-${pageNum}.pdf`
+        );
 
-    console.log(chalk.green("🎉 Splitting completed successfully!"));
+        if (existsSync(outputPath)) {
+          const shouldContinue = await confirmOverwrite(outputPath);
+          if (!shouldContinue) {
+            console.log(chalk.yellow(`⚠️  Skipping page ${pageNum}`));
+            continue;
+          }
+        }
+
+        const newPdf = await PDFDocument.create();
+        const [copiedPage] = await newPdf.copyPages(pdf, [i]);
+        newPdf.addPage(copiedPage);
+
+        const newPdfBytes = await newPdf.save();
+        await writeFile(outputPath, newPdfBytes);
+
+        console.log(chalk.green(`✅ Saved page ${pageNum}: ${outputPath}`));
+      }
+      console.log(chalk.green(`🎉 Split completed successfully! Created ${totalPages} files`));
+    }
   } catch (error) {
-    console.error(chalk.red("❌ Error splitting PDF: "), error);
+    console.error(chalk.red("❌ Error processing PDF: "), error);
     process.exit(1);
   }
 }

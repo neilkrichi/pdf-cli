@@ -22,8 +22,9 @@ program
   .command("split <file>")
   .description("Split a PDF into separate pages")
   .option("-o, --output <folder>", "Output folder", "output_pdfs")
+  .option("-r, --range <range>", "Page range to split (e.g. 1-10)")
   .action((file, options) => {
-    splitPDF(file, options.output);
+    splitPDF(file, options.output, options.range);
   });
 
 program.parse(process.argv);

@@ -1,6 +1,6 @@
 {
   "name": "@neilkrichi/pdf-cli",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A CLI tool for splitting and merging PDF files",
   "main": "dist/index.js",
   "bin": {
