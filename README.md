@@ -9,24 +9,10 @@ A command-line interface tool for manipulating PDF files. This tool provides sim
 
 ## Installation
 
-1. Clone the repository:
+Install globally using npm:
 
 ```bash
-git clone https://github.com/neilkrichi/pdf-cli.git
-cd pdf-cli
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Build and link the project:
-
-```bash
-npm run build
-npm link
+npm install -g @neilkrichi/pdf-cli
 ```
 
 ## Usage
@@ -62,15 +48,20 @@ pdf-cli merge "document 1.pdf" "document 2.pdf" -o "merged document.pdf"
 pdf-cli split "document with spaces.pdf" -o "output_pdfs"
 ```
 
+### File Overwrite Protection
+
+The tool will warn you when files are about to be overwritten and ask for confirmation:
+
+```bash
+pdf-cli merge doc1.pdf doc2.pdf -o existing.pdf
+⚠️  File "existing.pdf" already exists. Overwrite? (y/N)
+```
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Contributing
+## Issues
 
-1. Fork the repository
-2. Create a new branch
-3. Make your changes and commit them
-4. Push to your fork
-5. Create a pull request
+If you encounter any issues or have suggestions, please file them in the [GitHub repository](https://github.com/neilkrichi/pdf-cli/issues).
 

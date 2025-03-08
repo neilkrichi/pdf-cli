@@ -1,19 +1,30 @@
 {
-  "name": "pdf-cli",
+  "name": "@neilkrichi/pdf-cli",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "A CLI tool for splitting and merging PDF files",
+  "main": "dist/index.js",
   "bin": {
     "pdf-cli": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "postbuild": "chmod +x dist/index.js"
+    "postbuild": "chmod +x dist/index.js",
+    "prepare": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "pdf",
+    "cli",
+    "split",
+    "merge",
+    "pdf-tools"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",
     "commander": "^13.1.0",
