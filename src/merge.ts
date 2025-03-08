@@ -4,7 +4,7 @@ import chalk from "chalk";
 import path from "path";
 import { confirmOverwrite } from "./utils";
 
-export async function mergePDFs(files: string[], output: string) {
+export async function mergePDFs(files: string[], output: string = "merged.pdf") {
   try {
     console.log(chalk.blue("🔄 Merging PDFs..."));
 

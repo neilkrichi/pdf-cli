@@ -5,7 +5,7 @@ import path from "path";
 import chalk from "chalk";
 import { confirmOverwrite } from "./utils";
 
-export async function splitPDF(file: string, outputFolder: string) {
+export async function splitPDF(file: string, outputFolder: string = "output_pdfs") {
   try {
     console.log(chalk.blue("🔄 Splitting PDF..."));
 
