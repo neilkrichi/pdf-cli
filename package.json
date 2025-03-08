@@ -1,6 +1,6 @@
 {
   "name": "@neilkrichi/pdf-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI tool for splitting and merging PDF files",
   "main": "dist/index.js",
   "bin": {
@@ -23,7 +23,7 @@
     "merge",
     "pdf-tools"
   ],
-  "author": "Your Name",
+  "author": "Neil Krichi",
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",
