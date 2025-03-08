@@ -53,6 +53,15 @@ pdf-cli split input.pdf -o output-folder
 Options:
 - `-o, --output`: Output folder (default: "output_pdfs")
 
+### Spaces in file names
+
+If you have spaces in the file names, you can use quotes around the file name:
+
+```bash
+pdf-cli merge "document 1.pdf" "document 2.pdf" -o "merged document.pdf"
+pdf-cli split "document with spaces.pdf" -o "output_pdfs"
+```
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
